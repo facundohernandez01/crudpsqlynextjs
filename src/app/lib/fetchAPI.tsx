@@ -15,7 +15,7 @@ import {
   Button,
 } from "@mui/material";
 
-interface Photo {
+interface Producto {
   id: number;
   title: string;
   price: number;
@@ -24,18 +24,18 @@ interface Photo {
   image: string;
 }
 
-interface PhotoListProps {
+interface ProductosListProps {
   searchQuery: string;
   apiRoute?: string; // Nueva prop opcional
 }
 
-export const PhotoList: React.FC<PhotoListProps> = ({ searchQuery, apiRoute = "/api/productos" }) => {
-  const [photos, setPhotos] = useState<Photo[]>([]);
+export const ProductosList: React.FC<ProductosListProps> = ({ searchQuery, apiRoute = "/api/productos" }) => {
+  const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
 
   // eliminar
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [selectedProducto, setSelectedProducto] = useState<Producto | null>(null);
 
   // editar
   const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -47,56 +47,56 @@ export const PhotoList: React.FC<PhotoListProps> = ({ searchQuery, apiRoute = "/
   useEffect(() => {
     fetch(apiRoute)
       .then((response) => response.json())
-      .then((data: Photo[]) => {
-        setPhotos(data.slice(0, 20));
+      .then((data: Producto[]) => {
+        setProductos(data.slice(0, 20));
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching photos:", error);
+        console.error("Error fetching productos:", error);
         setLoading(false);
       });
   }, [apiRoute]); // Dependencia actualizada
 
   // 🔹 eliminar
-  const handleDeleteClick = (photo: Photo) => {
-    setSelectedPhoto(photo);
+  const handleDeleteClick = (producto: Producto) => {
+    setSelectedProducto(producto);
     setOpenDeleteDialog(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedPhoto) return;
+    if (!selectedProducto) return;
     try {
-      await fetch(`/api/productos?id=${selectedPhoto.id}`, {
+      await fetch(`/api/productos?id=${selectedProducto.id}`, {
         method: "DELETE",
       });
-      setPhotos((prev) => prev.filter((p) => p.id !== selectedPhoto.id));
+      setProductos((prev) => prev.filter((p) => p.id !== selectedProducto.id));
       setSnackbar({ open: true, message: "Producto eliminado correctamente", severity: "success" });
     } catch {
       setSnackbar({ open: true, message: "Error al eliminar producto", severity: "error" });
     }
     setOpenDeleteDialog(false);
-    setSelectedPhoto(null);
+    setSelectedProducto(null);
   };
 
   // 🔹 editar
-  const handleEditClick = (photo: Photo) => {
-    setSelectedPhoto(photo);
+  const handleEditClick = (producto: Producto) => {
+    setSelectedProducto(producto);
     setEditForm({
-      title: photo.title,
-      price: String(photo.price),
-      description: photo.description,
+      title: producto.title,
+      price: String(producto.price),
+      description: producto.description,
     });
     setOpenEditDialog(true);
   };
 
   const handleSaveEdit = async () => {
-    if (!selectedPhoto) return;
+    if (!selectedProducto) return;
     try {
       const res = await fetch("/api/productos", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: selectedPhoto.id,
+          id: selectedProducto.id,
           title: editForm.title,
           price: editForm.price,
           description: editForm.description,
@@ -107,7 +107,7 @@ export const PhotoList: React.FC<PhotoListProps> = ({ searchQuery, apiRoute = "/
 
       const updated = await res.json();
 
-      setPhotos((prev) =>
+      setProductos((prev) =>
         prev.map((p) => (p.id === updated.id ? { ...p, ...updated } : p))
       );
 
@@ -116,18 +116,18 @@ export const PhotoList: React.FC<PhotoListProps> = ({ searchQuery, apiRoute = "/
       setSnackbar({ open: true, message: "Error al editar producto", severity: "error" });
     }
     setOpenEditDialog(false);
-    setSelectedPhoto(null);
+    setSelectedProducto(null);
   };
 
   const handleCancelDelete = () => {
     setOpenDeleteDialog(false);
-    setSelectedPhoto(null);
+    setSelectedProducto(null);
   };
 
-  const filteredPhotos = photos.filter(
-    (photo) =>
-      photo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      photo.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProductos = productos.filter(
+    (producto) =>
+      producto.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      producto.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) return <p>Cargando fotos...</p>;
@@ -140,14 +140,14 @@ export const PhotoList: React.FC<PhotoListProps> = ({ searchQuery, apiRoute = "/
       paddingTop={10}
       justifyContent="center" // 👈 centra los items
     >
-      {filteredPhotos.map((photo) => (
-        <Grid item key={photo.id}>
+      {filteredProductos.map((producto) => (
+        <Grid item key={producto.id}>
           <Tarjeta
-            titulo={photo.title}
-            descripcion={photo.description}
-            onAccion={() => handleEditClick(photo)}
+            titulo={producto.title}
+            descripcion={producto.description}
+            onAccion={() => handleEditClick(producto)}
             accionTexto="Editar"
-            onEliminar={() => handleDeleteClick(photo)}
+            onEliminar={() => handleDeleteClick(producto)}
           />
         </Grid>
       ))}
@@ -158,7 +158,7 @@ export const PhotoList: React.FC<PhotoListProps> = ({ searchQuery, apiRoute = "/
       <ConfirmDialog
         open={openDeleteDialog}
         title="Confirmar eliminación"
-        message={`¿Seguro que quieres eliminar "${selectedPhoto?.title}"?`}
+        message={`¿Seguro que quieres eliminar "${selectedProducto?.title}"?`}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         

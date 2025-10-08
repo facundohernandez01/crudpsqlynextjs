@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -49,7 +48,6 @@ const Cabecera: React.FC<CabeceraProps> = ({ darkMode, toggleDarkMode, onToggleD
         }}
       >
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          {/* Izquierda: Título + Buscador */}
           <Box display="flex" alignItems="center" gap={2}>
             <Typography variant="h6">CRUD</Typography>
               <IconButton color="inherit" onClick={onToggleDrawer}>
