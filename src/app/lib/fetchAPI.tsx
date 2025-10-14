@@ -26,10 +26,10 @@ interface Producto {
 
 interface ProductosListProps {
   searchQuery: string;
-  apiRoute?: string; // Nueva prop opcional
+  refresh?: number;
 }
 
-export const ProductosList: React.FC<ProductosListProps> = ({ searchQuery, apiRoute = "/api/productos" }) => {
+export const ProductosList: React.FC<ProductosListProps> = ({ searchQuery, refresh }) => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +45,7 @@ export const ProductosList: React.FC<ProductosListProps> = ({ searchQuery, apiRo
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" as "success" | "error" });
 
   useEffect(() => {
-    fetch(apiRoute)
+    fetch("/api/productos")
       .then((response) => response.json())
       .then((data: Producto[]) => {
         setProductos(data.slice(0, 20));
@@ -55,7 +55,7 @@ export const ProductosList: React.FC<ProductosListProps> = ({ searchQuery, apiRo
         console.error("Error fetching productos:", error);
         setLoading(false);
       });
-  }, [apiRoute]); // Dependencia actualizada
+  }, [refresh]); // Se vuelve a ejecutar cuando refresh cambia
 
   // 🔹 eliminar
   const handleDeleteClick = (producto: Producto) => {

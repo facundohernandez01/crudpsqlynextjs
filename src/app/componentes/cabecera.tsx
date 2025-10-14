@@ -18,10 +18,19 @@ interface CabeceraProps {
   darkMode: boolean;
   toggleDarkMode: () => void;
   onToggleDrawer: () => void;
-
+  userName?: string;
+  authButton?: React.ReactNode;
+  onNuevoProducto?: () => void;
 }
 
-const Cabecera: React.FC<CabeceraProps> = ({ darkMode, toggleDarkMode, onToggleDrawer }) => {
+const Cabecera: React.FC<CabeceraProps> = ({
+  darkMode,
+  toggleDarkMode,
+  onToggleDrawer,
+  userName,
+  authButton,
+  onNuevoProducto,
+}) => {
   const [openModal, setOpenModal] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
 
@@ -37,50 +46,41 @@ const Cabecera: React.FC<CabeceraProps> = ({ darkMode, toggleDarkMode, onToggleD
 
   return (
     <>
-      <AppBar
-        position="fixed"
-        sx={{
-          width: "100%",
-          left: 0,
-          background: "linear-gradient(90deg, #350076ff 0%, #df006cff 70%, #df6100ff 100%)",
-          zIndex: 1300,
-
-        }}
-      >
+      <AppBar position="fixed" >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box display="flex" alignItems="center" gap={2}>
             <Typography variant="h6">CRUD</Typography>
-              <IconButton color="inherit" onClick={onToggleDrawer}>
-            <MenuIcon />
-          </IconButton>
+            <IconButton color="inherit" onClick={onToggleDrawer}>
+              <MenuIcon />
+            </IconButton>
           </Box>
-       <Box sx={{ width: 300 }}>
-              <Buscador />
-            </Box>
+          <Box sx={{ width: 300 }}>
+            <Buscador />
+          </Box>
           {/* Derecha: Botones */}
           <Box display="flex" alignItems="center" gap={1}>
             <Button
               variant="gradient"
               color="inherit"
-              onClick={() => setOpenModal(true)}
+              onClick={onNuevoProducto}
             >
               Nuevo Producto
             </Button>
-
             <IconButton color="inherit" onClick={handleFullscreen}>
               {fullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
             </IconButton>
-
             <IconButton color="inherit" onClick={toggleDarkMode}>
               {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
+            {/* MSAL Auth */}
+            {authButton}
           </Box>
         </Toolbar>
       </AppBar>
-
       <ModalProducto open={openModal} onClose={() => setOpenModal(false)} />
     </>
   );
 };
 
 export default Cabecera;
+
