@@ -1,22 +1,21 @@
 "use client";
-import Demo from "./componentes/componenteDemo";
+
+import React, { useState, useEffect, Suspense } from "react";
+import { Toolbar, useMediaQuery, useTheme, Box, Container } from "@mui/material";
 import Cabecera from "./componentes/cabecera";
-import { ProductosList } from "./lib/fetchAPI";
-import Container from "@mui/material/Container";
-import { useSearch } from "./componentes/SearchContext";
-import { SearchProvider } from "./componentes/SearchContext";
-import CustomThemeProvider from "./ui/ThemeProvider";
-import { useState, useEffect } from "react";
-import UserList from "./componentes/UserList";
-import { Toolbar, useMediaQuery, useTheme, Box } from "@mui/material";
 import DrawerComponent from "./componentes/menulateral";
+import { ProductosList } from "./lib/fetchAPI";
+import UserList from "./componentes/UserList";
+import ModalProducto from "./componentes/ModalProducto";
+import { useSearch, SearchProvider } from "./componentes/SearchContext";
+import CustomThemeProvider from "./ui/ThemeProvider";
 import { MsalProvider, useMsal, useIsAuthenticated } from "@azure/msal-react";
-import { PublicClientApplication, type IPublicClientApplication } from "@azure/msal-browser";
+import { PublicClientApplication } from "@azure/msal-browser";
 import { msalConfig } from "./msalConfig";
 import AuthButton from "./componentes/AuthButton";
-import ModalProducto from "./componentes/ModalProducto";
 
-// ✅ instancia global, fuera del componente
+const CapacitacionesList = React.lazy(() => import("./componentes/CapacitacionesList"));
+
 const msalInstance = new PublicClientApplication(msalConfig);
 
 interface MainContentProps {
@@ -26,22 +25,23 @@ interface MainContentProps {
 
 function MainContent({ darkMode, toggleDarkMode }: MainContentProps) {
   const { searchQuery } = useSearch();
-  const [view, setView] = useState<"productos" | "usuarios">("productos");
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
-  const [refreshProductos, setRefreshProductos] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const userName = isAuthenticated ? accounts[0]?.name : "";
 
-  const handleToggleDrawer = () => setOpenDrawer((prev) => !prev);
+  // Estado de vistas único
+  const [view, setView] = useState<"productos" | "usuarios" | "capacitaciones">("productos");
 
-  // Nueva función para refrescar productos
-  const handleProductoAgregado = () => {
-    setRefreshProductos((prev) => prev + 1);
-  };
+  // Drawer
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const handleToggleDrawer = () => setOpenDrawer(prev => !prev);
+
+  // Modal Nuevo Producto
+  const [openModal, setOpenModal] = useState(false);
+  const [refreshProductos, setRefreshProductos] = useState(0);
+  const handleProductoAgregado = () => setRefreshProductos(prev => prev + 1);
 
   return (
     <>
@@ -50,7 +50,9 @@ function MainContent({ darkMode, toggleDarkMode }: MainContentProps) {
         toggleDarkMode={toggleDarkMode}
         onToggleDrawer={handleToggleDrawer}
         userName={userName}
-        authButton={<AuthButton />}
+        authButton={
+          <AuthButton onShowCapacitaciones={() => setView("capacitaciones")} />
+        }
         onNuevoProducto={() => setOpenModal(true)}
       />
       <Toolbar />
@@ -72,15 +74,19 @@ function MainContent({ darkMode, toggleDarkMode }: MainContentProps) {
         }}
       >
         <Container maxWidth="lg">
-          <Demo />
-          {view === "productos" ? (
+          {view === "capacitaciones" ? (
+            <Suspense fallback={<div>Cargando capacitaciones...</div>}>
+              <CapacitacionesList />
+            </Suspense>
+          ) : view === "productos" ? (
             <ProductosList searchQuery={searchQuery} refresh={refreshProductos} />
           ) : (
             <UserList searchQuery={searchQuery} />
           )}
         </Container>
       </Box>
-      {/* Modal para nuevo producto */}
+
+      {/* Modal Nuevo Producto */}
       <ModalProducto
         open={openModal}
         onClose={() => setOpenModal(false)}
@@ -92,17 +98,14 @@ function MainContent({ darkMode, toggleDarkMode }: MainContentProps) {
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(true);
-  const toggleDarkMode = () => setDarkMode((prev) => !prev);
+  const toggleDarkMode = () => setDarkMode(prev => !prev);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // ✅ aseguramos inicialización antes de renderizar el provider
     msalInstance.initialize().then(() => setIsInitialized(true));
   }, []);
 
-  if (!isInitialized) {
-    return null; // o un loader si querés
-  }
+  if (!isInitialized) return null;
 
   return (
     <MsalProvider instance={msalInstance}>

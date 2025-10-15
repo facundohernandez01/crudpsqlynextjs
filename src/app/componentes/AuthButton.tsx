@@ -9,8 +9,10 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import SchoolIcon from "@mui/icons-material/School";
 
-export default function AuthButton(): JSX.Element {
+export default function AuthButton({ onShowCapacitaciones }: { onShowCapacitaciones: () => void }): JSX.Element {
   const { instance, accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -145,6 +147,12 @@ export default function AuthButton(): JSX.Element {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
+        <MenuItem onClick={() => { onShowCapacitaciones(); handleClose(); }}>
+          <ListItemIcon>
+            <SchoolIcon fontSize="small" />
+          </ListItemIcon>
+          Mis capacitaciones
+        </MenuItem>
         <MenuItem disabled>{user?.name}</MenuItem>
         <MenuItem onClick={handleLogout}>Cerrar sesión</MenuItem>
       </Menu>

@@ -16,14 +16,24 @@ interface DrawerComponentProps {
   setView: React.Dispatch<React.SetStateAction<"productos" | "usuarios">>;
 }
 
-const DrawerComponent: React.FC<DrawerComponentProps> = ({ isOpen, onClose, view, setView }) => {
+const DrawerComponent: React.FC<DrawerComponentProps> = ({
+  isOpen,
+  onClose,
+  view,
+  setView,
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const drawerWidth = 240;
 
+  const handleViewChange = (newView: "productos" | "usuarios") => {
+    onClose(); // cerrar drawer primero
+    setTimeout(() => setView(newView), 0); // cambiar vista después
+  };
+
   return (
     <Drawer
-      variant={isMobile ? "temporary" : "persistent"} // temporal en móvil, fijo en desktop
+      variant={isMobile ? "temporary" : "persistent"}
       anchor="left"
       open={isOpen}
       onClose={onClose}
@@ -33,7 +43,7 @@ const DrawerComponent: React.FC<DrawerComponentProps> = ({ isOpen, onClose, view
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",
-          marginTop: isMobile ? 0 : "64px", // separa del AppBar en desktop
+          marginTop: isMobile ? 0 : "64px",
           height: isMobile ? "100%" : "calc(100% - 64px)",
         },
       }}
@@ -42,10 +52,7 @@ const DrawerComponent: React.FC<DrawerComponentProps> = ({ isOpen, onClose, view
         <ListItem disablePadding>
           <ListItemButton
             selected={view === "productos"}
-            onClick={() => {
-              setView("productos");
-              onClose(); // cierra el drawer después de elegir
-            }}
+            onClick={() => handleViewChange("productos")}
           >
             <ListItemText primary="Productos" />
           </ListItemButton>
@@ -53,10 +60,7 @@ const DrawerComponent: React.FC<DrawerComponentProps> = ({ isOpen, onClose, view
         <ListItem disablePadding>
           <ListItemButton
             selected={view === "usuarios"}
-            onClick={() => {
-              setView("usuarios");
-              onClose();
-            }}
+            onClick={() => handleViewChange("usuarios")}
           >
             <ListItemText primary="Usuarios" />
           </ListItemButton>
