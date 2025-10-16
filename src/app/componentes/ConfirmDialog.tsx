@@ -30,8 +30,8 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel}>Cancelar</Button>
-        <Button color="error" onClick={onConfirm} autoFocus>
+        <Button variant="outlined" onClick={onCancel}>Cancelar</Button>
+        <Button variant="contained" color="error" onClick={onConfirm} autoFocus>
           Eliminar
         </Button>
       </DialogActions>

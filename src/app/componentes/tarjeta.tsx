@@ -10,7 +10,7 @@ interface TarjetaProps {
   descripcion: string;
   onAccion?: () => void;
   accionTexto?: string;
-  onEliminar?: () => void; // 👈 nueva prop opcional
+  onEliminar?: () => void;
 }
 
 const Tarjeta: React.FC<TarjetaProps> = ({

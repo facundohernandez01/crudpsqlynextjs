@@ -13,6 +13,7 @@ import { MsalProvider, useMsal, useIsAuthenticated } from "@azure/msal-react";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { msalConfig } from "./msalConfig";
 import AuthButton from "./componentes/AuthButton";
+import useMicrosoftUser from "./hooks/useMicrosoftUser";
 
 const CapacitacionesList = React.lazy(() => import("./componentes/CapacitacionesList"));
 
@@ -30,6 +31,7 @@ function MainContent({ darkMode, toggleDarkMode }: MainContentProps) {
   const { accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const userName = isAuthenticated ? accounts[0]?.name : "";
+  const user = useMicrosoftUser();
 
   // Estado de vistas único
   const [view, setView] = useState<"productos" | "usuarios" | "capacitaciones">("productos");
@@ -81,7 +83,7 @@ function MainContent({ darkMode, toggleDarkMode }: MainContentProps) {
           ) : view === "productos" ? (
             <ProductosList searchQuery={searchQuery} refresh={refreshProductos} />
           ) : (
-            <UserList searchQuery={searchQuery} />
+            <UserList user={user} searchQuery={searchQuery} />
           )}
         </Container>
       </Box>

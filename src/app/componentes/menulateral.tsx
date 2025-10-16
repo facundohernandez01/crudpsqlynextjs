@@ -62,7 +62,7 @@ const DrawerComponent: React.FC<DrawerComponentProps> = ({
             selected={view === "usuarios"}
             onClick={() => handleViewChange("usuarios")}
           >
-            <ListItemText primary="Usuarios" />
+            <ListItemText primary="Team MDA" />
           </ListItemButton>
         </ListItem>
       </List>
